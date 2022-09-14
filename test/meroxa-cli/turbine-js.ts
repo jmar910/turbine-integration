@@ -1,5 +1,8 @@
-import child_process from "child_process";
+import child_process, { ChildProcess } from "child_process";
 import fs from "fs-extra";
+import util from "util";
+
+const execAsync = util.promisify(child_process.exec);
 
 QUnit.module("Meroxa CLI | turbine-js", (hooks) => {
   hooks.before(() => {
@@ -38,21 +41,65 @@ QUnit.module("Meroxa CLI | turbine-js", (hooks) => {
   });
 
   QUnit.module("meroxa apps run", (hooks) => {
-    let output: Buffer;
-    hooks.before(() => {
-      output = child_process.execSync(
-        "meroxa apps run --path ./test/generated"
-      );
+    let cliProcess: { stdout: string; stderr: string };
+    hooks.before(async () => {
+      cliProcess = await execAsync("meroxa apps run --path ./test/generated");
     });
 
     QUnit.test(
       "executes the data app locally and logs the output",
       async (assert) => {
         assert.ok(
-          output.toString().includes("===to destination_name resource===")
+          cliProcess.stdout.includes("===to destination_name resource===")
         );
-        assert.ok(output.toString().includes("customer_email: '~~~"));
+        assert.ok(
+          cliProcess.stdout.toString().includes("customer_email: '~~~")
+        );
       }
     );
+  });
+  QUnit.module("meroxa apps deploy", (hooks) => {
+    let serverProcess: ChildProcess;
+    let cliProcess: { stdout: string; stderr: string };
+
+    hooks.before(async () => {
+      serverProcess = child_process.fork("server.js");
+
+      await new Promise((resolve) => {
+        serverProcess.on("message", (data) => {
+          if (data === "READY") {
+            resolve(1);
+          }
+        });
+      });
+
+      try {
+        await execAsync("meroxa login");
+
+        await execAsync(
+          "cd test/generated && git add . && git commit -m 'woooooooo'"
+        );
+
+        cliProcess = await execAsync(
+          "API_URL=http://localhost:8181/v1 meroxa apps deploy --path ./test/generated"
+        );
+        console.log(cliProcess.stdout);
+      } catch (e) {
+        console.log(e);
+      }
+    });
+
+    hooks.after(async () => {
+      serverProcess.kill();
+    });
+
+    QUnit.test("successfully deploys the app", (assert) => {
+      assert.ok(
+        cliProcess.stdout.includes(
+          `Application "generated" successfully created!`
+        )
+      );
+      assert.ok(cliProcess.stdout.includes(`To visualize your application`));
+    });
   });
 });
