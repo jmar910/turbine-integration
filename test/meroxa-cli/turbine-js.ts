@@ -1,5 +1,6 @@
 import child_process, { ChildProcess } from "child_process";
 import fs from "fs-extra";
+import { stderr } from "process";
 import util from "util";
 
 const execAsync = util.promisify(child_process.exec);
@@ -74,7 +75,14 @@ QUnit.module("Meroxa CLI | turbine-js", (hooks) => {
       });
 
       try {
-        await execAsync("meroxa login");
+        child_process.exec("meroxa login", (err, stdout, stderr) => {
+          if (err) {
+            console.error(`exec error: ${err}`);
+            return;
+          }
+          console.log(`stdout: ${stdout}`);
+          console.error(`stderr: ${stderr}`);
+        });
 
         await execAsync(
           "cd test/generated && git add . && git commit -m 'woooooooo'"
