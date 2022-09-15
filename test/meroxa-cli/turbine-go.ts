@@ -73,7 +73,7 @@ QUnit.module("Meroxa CLI | turbine-go", (hooks) => {
         child_process.exec("meroxa login", (err, stdout, stderr) => {
           if (err) {
             console.error(`exec error: ${err}`);
-            return;
+            throw err;
           }
           console.log(`stdout: ${stdout}`);
           console.error(`stderr: ${stderr}`);
