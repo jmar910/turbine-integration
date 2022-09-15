@@ -70,12 +70,14 @@ QUnit.module("Meroxa CLI | turbine-go", (hooks) => {
       });
 
       try {
-        await execAsync("meroxa login");
+        await execAsync("meroxa login", { timeout: 15000 });
         await execAsync(
-          `cd ${GOPATH}/src/generated && git add . && git commit -m 'wooooooo'`
+          `cd ${GOPATH}/src/generated && git add . && git commit -m 'wooooooo'`,
+          { timeout: 15000 }
         );
         cliProcess = await execAsync(
-          `API_URL=http://localhost:8181/v1 meroxa apps deploy --path ${GOPATH}/src/generated`
+          `API_URL=http://localhost:8181/v1 meroxa apps deploy --path ${GOPATH}/src/generated`,
+          { timeout: 15000 }
         );
         console.log(cliProcess.stdout);
       } catch (e) {

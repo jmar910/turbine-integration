@@ -74,14 +74,16 @@ QUnit.module("Meroxa CLI | turbine-js", (hooks) => {
       });
 
       try {
-        await execAsync("meroxa login");
+        await execAsync("meroxa login", { timeout: 15000 });
 
         await execAsync(
-          "cd test/generated && git add . && git commit -m 'woooooooo'"
+          "cd test/generated && git add . && git commit -m 'woooooooo'",
+          { timeout: 15000 }
         );
 
         cliProcess = await execAsync(
-          "API_URL=http://localhost:8181/v1 meroxa apps deploy --path ./test/generated"
+          "API_URL=http://localhost:8181/v1 meroxa apps deploy --path ./test/generated",
+          { timeout: 15000 }
         );
         console.log(cliProcess.stdout);
       } catch (e) {
