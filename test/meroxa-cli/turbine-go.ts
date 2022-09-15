@@ -70,7 +70,14 @@ QUnit.module("Meroxa CLI | turbine-go", (hooks) => {
       });
 
       try {
-        await execAsync("meroxa login");
+        child_process.exec("meroxa login", (err, stdout, stderr) => {
+          if (err) {
+            console.error(`exec error: ${err}`);
+            return;
+          }
+          console.log(`stdout: ${stdout}`);
+          console.error(`stderr: ${stderr}`);
+        });
         await execAsync(
           `cd ${GOPATH}/src/generated && git add . && git commit -m 'wooooooo'`
         );
