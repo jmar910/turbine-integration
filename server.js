@@ -12,8 +12,6 @@ const logger = function (req, res, next) {
     return;
   }
 
-  console.log("\n");
-
   res.on("finish", () => {
     console.log(`${req.method} ${req.path} ${res.statusCode}`);
   });

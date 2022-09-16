@@ -74,7 +74,11 @@ QUnit.module("Meroxa CLI | turbine-js", (hooks) => {
       });
 
       try {
-        await execAsync("meroxa login", { timeout: 15000 });
+        child_process.spawnSync("meroxa login", { timeout: 15000 });
+
+        await new Promise((resolve) => {
+          setTimeout(resolve, 9000);
+        });
 
         await execAsync(
           "cd test/generated && git add . && git commit -m 'woooooooo'",
