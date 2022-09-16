@@ -70,9 +70,23 @@ QUnit.module("Meroxa CLI | turbine-go", (hooks) => {
       });
 
       try {
-        child_process.spawnSync("meroxa login", { timeout: 15000 });
+        child_process.exec(
+          "meroxa login",
+          { timeout: 15000 },
+          (err, stdout, stderr) => {
+            console.log(stdout);
+          }
+        );
+
+        // const c = child_process.exec(
+        //   "meroxa login",
+        //   { timeout: 15000 },
+        //   (err, stdout, stderr) => {
+        //     console.log(stdout);
+        //   }
+        // );
         await new Promise((resolve) => {
-          setTimeout(resolve, 9000);
+          setTimeout(resolve, 5000);
         });
         await execAsync(
           `cd ${GOPATH}/src/generated && git add . && git commit -m 'wooooooo'`,
